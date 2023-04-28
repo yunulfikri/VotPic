@@ -1,22 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:ruangbawah/components/ad_helper.dart';
-import 'package:ruangbawah/components/featured_card.dart';
-import 'package:ruangbawah/components/post_card.dart';
-import 'package:ruangbawah/helper/api_helper.dart';
+import '../components/ad_helper.dart';
+import '../components/featured_card.dart';
+import '../components/post_card.dart';
+import '../helper/api_helper.dart';
 import '../helper/post.dart';
 import 'detail.dart';
-import 'package:ruangbawah/components/category_boxes.dart';
-import 'package:ruangbawah/components/icons.dart';
-import 'package:ruangbawah/components/discover_card.dart';
-import 'package:ruangbawah/components/discover_small_card.dart';
-import 'package:ruangbawah/components/svg_asset.dart';
+import '../components/category_boxes.dart';
+import '../components/icons.dart';
+import '../components/discover_card.dart';
+import '../components/svg_asset.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({
@@ -95,7 +91,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           fontWeight: FontWeight.bold)),
                   InkWell(
                     borderRadius: BorderRadius.circular(360),
-                    onTap: onSearchIconTapped,
+                    onTap: () {},
                     child: Container(
                       height: 35.w,
                       width: 35.w,
@@ -152,7 +148,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         fontSize: 14.w),
                   ),
                   GestureDetector(
-                      onTap: onSeeAllTapped,
+                      onTap: () {},
                       child: Text("See All",
                           style: TextStyle(
                               color: Color(0xff4A80F0),
@@ -172,26 +168,26 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 children: [
                   SizedBox(width: 28.w),
                   FeaturedCard(
-                    onTap: onSleepMeditationTapped,
+                    onTap: () {},
                     imgUrl:
                         "https://images.pexels.com/photos/774866/pexels-photo-774866.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                   ),
                   SizedBox(width: 28.w),
                   FeaturedCard(
-                    onTap: onSleepMeditationTapped,
+                    onTap: () {},
                     imgUrl:
                         "https://images.pexels.com/photos/3262911/pexels-photo-3262911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
                   ),
                   SizedBox(width: 28.w),
                   DiscoverCard(
                     tag: "sleepMeditation",
-                    onTap: onSleepMeditationTapped,
+                    onTap: () {},
                     title: "Sleep Meditation",
                     subtitle: "7 Day Audio and Video Series",
                   ),
                   SizedBox(width: 20.w),
                   DiscoverCard(
-                    onTap: onDepressionHealingTapped,
+                    onTap: () {},
                     title: "Depression Healing",
                     subtitle: "10 Days Audio and Video Series",
                     gradientStartColor: Color(0xffFC67A7),
@@ -215,59 +211,54 @@ class _DiscoverPageState extends State<DiscoverPage> {
             ),
             SizedBox(height: 16.h),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 28.w),
-              child: FutureBuilder<List<PostList>>(
-                future: ApiHelper().getAllMyPost(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return PostListWidget(postList: snapshot.data!);
-                  } else if (snapshot.hasError) {
-                    return Text(
-                      '${snapshot.error}',
-                      style: const TextStyle(color: Colors.white),
-                    );
-                  }
-                  return const CupertinoActivityIndicator();
-                },
-              )
-            )
+                padding: EdgeInsets.symmetric(horizontal: 28.w),
+                child: FutureBuilder<List<PostList>>(
+                  future: ApiHelper().getAllMyPost(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return PostListWidget(postList: snapshot.data!);
+                    } else if (snapshot.hasError) {
+                      return Text(
+                        '${snapshot.error}',
+                        style: const TextStyle(color: Colors.white),
+                      );
+                    }
+                    return const CupertinoActivityIndicator();
+                  },
+                ))
           ],
         ),
       ),
     );
   }
-
-  void onSeeAllTapped() {}
-
-  void onSleepMeditationTapped() {
-    Get.to(() => DetailPage(), transition: Transition.rightToLeft);
-  }
-
-  void onDepressionHealingTapped() {}
-
-  void onSearchIconTapped() {}
 }
 
 class PostListWidget extends StatelessWidget {
   const PostListWidget({Key? key, required this.postList}) : super(key: key);
-final List<PostList> postList;
+  final List<PostList> postList;
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       physics: BouncingScrollPhysics(),
       shrinkWrap: true,
       itemCount: postList.length,
-      itemBuilder: (context, length){
+      itemBuilder: (context, index) {
         return PostCard(
-          onTap: (){},
-          onTapLike: (){},
-          imgUrl:
-          "https://images.pexels.com/photos/3262911/pexels-photo-3262911.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-          title: "Smile Woman",
-          author: "Null Photograph",
-          captions: "Something difeirent print('');",
-          like: "242",
-          comments: "67",
+          onTap: () {
+            Get.to(DetailPage(
+                uuid: postList[index].uuid,
+                author: postList[index].author,
+                captions: postList[index].captions,
+                photo_url: postList[index].photo_url,
+                like: postList[index].like.toString(),
+                comment: postList[index].comment.toString()));
+          },
+          onTapLike: () {},
+          imgUrl: postList[index].photo_url,
+          author: postList[index].author,
+          captions: postList[index].captions,
+          like: postList[index].like.toString(),
+          comments: postList[index].comment.toString(),
         );
       },
     );

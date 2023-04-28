@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:ruangbawah/screens/post_image.dart';
+import 'post_image.dart';
 import 'dart:io';
-import 'package:ruangbawah/screens/post_text.dart';
+import 'post_text.dart';
 import 'charts.dart';
 import 'discover.dart';
-import 'package:ruangbawah/components/icons.dart';
-import 'package:ruangbawah/screens/profile_page.dart';
-import 'package:ruangbawah/components/svg_asset.dart';
+import '../components/icons.dart';
+import 'profile_page.dart';
+import '../components/svg_asset.dart';
 import 'package:get/get.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

@@ -1,11 +1,11 @@
 {
-    "name": "ruangbawah",
-    "short_name": "ruangbawah",
+    "name": "photoshare",
+    "short_name": "photoshare",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new ruangbawah project.",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

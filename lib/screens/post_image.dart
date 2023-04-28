@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:ruangbawah/components/ad_helper.dart';
-import 'package:ruangbawah/helper/api_helper.dart';
+import '../components/ad_helper.dart';
+import '../helper/api_helper.dart';
 import 'dart:io';
 import '../components/icons.dart';
 import '../components/svg_asset.dart';
@@ -21,6 +21,8 @@ class PostImageScreen extends StatefulWidget {
 class _PostImageScreenState extends State<PostImageScreen> {
   String? imageUrl;
   BannerAd? _bannerAd;
+  final TextEditingController _postText = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -74,14 +76,15 @@ class _PostImageScreenState extends State<PostImageScreen> {
     });
 
   }
-  postSubmit(){
-    if(imageUrl != null){
-
+  postSubmit(ctx){
+    if(imageUrl == null){
+      var snackBar = const SnackBar(content: Text('Please Wait! Try Again'));
+      ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
     }else{
       print("Sedang progress upload");
+      ApiHelper().publishPost(_postText.text, imageUrl!, context);
     }
   }
-  final TextEditingController _postText = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,40 +132,13 @@ class _PostImageScreenState extends State<PostImageScreen> {
                   ),
                   child: TextField(
                     controller: _postText,
-
-                    autofocus: true,
-                    scrollPhysics: const BouncingScrollPhysics(),
-                    decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "The Title? (Opsional)"
-                    ),
-                    style: TextField.materialMisspelledTextStyle,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 22.w,
-                    vertical: 5.h,
-                  ),
-
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 5.0
-                  ),
-                  child: TextField(
-                    controller: _postText,
                     minLines: 5,
                     maxLines: 20,
                     autofocus: true,
                     scrollPhysics: const BouncingScrollPhysics(),
                     decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: "What u Think?"
+                        hintText: "Captions...."
                     ),
                     style: TextField.materialMisspelledTextStyle,
                   ),
@@ -254,7 +230,9 @@ class _PostImageScreenState extends State<PostImageScreen> {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: (){},
+                      onTap: (){
+                        postSubmit(context);
+                      },
                       child: Ink(
                         decoration: BoxDecoration(
                           color: const Color(0xff4A80F0),

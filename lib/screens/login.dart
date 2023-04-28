@@ -1,13 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'package:ruangbawah/helper/api_helper.dart';
-import 'package:ruangbawah/screens/home.dart';
-import 'package:ruangbawah/screens/register.dart';
-import 'package:ruangbawah/components/background_auth.dart';
+import '../helper/api_helper.dart';
+import 'home.dart';
+import 'register.dart';
+import '../components/background_auth.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 class LoginScreen extends StatelessWidget {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();

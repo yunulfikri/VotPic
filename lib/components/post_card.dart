@@ -1,15 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:ruangbawah/components/svg_asset.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'svg_asset.dart';
 
 import 'icons.dart';
 
 class PostCard extends StatelessWidget {
   final Function? onTap, onTapLike;
-  final String? imgUrl, author, like, comments, captions, title;
+  final String? imgUrl, author, like, comments, captions;
 
   const PostCard(
-      {Key? key, this.onTap, this.imgUrl, this.author, this.like, this.captions, this.title, this.onTapLike, this.comments})
+      {Key? key, this.onTap, this.imgUrl, this.author, this.like, this.captions, this.onTapLike, this.comments})
       : super(key: key);
 
   @override
@@ -21,14 +24,27 @@ class PostCard extends StatelessWidget {
           InkWell(
             onTap: () => onTap!(),
             borderRadius: BorderRadius.circular(26),
-            child: Container(
-              height: 176.w,
-              width: 305.w,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(26),
+            child: CachedNetworkImage(
+              imageUrl: imgUrl!,
+              httpHeaders: const {
+                'Connection': 'keep-alive'
+              },
+              progressIndicatorBuilder: (context, url, downloadProgress) => const CupertinoActivityIndicator(color: Colors.white70),
+              imageBuilder: (context, imgProvider) => Container(
+                height: 176.w,
+                width: 305.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
                   image: DecorationImage(
-                      image: NetworkImage(imgUrl!), fit: BoxFit.cover)),
-
+                    image: imgProvider,
+                    fit: BoxFit.cover,
+                  )
+                ),
+              ),
+              errorWidget: (context, url, error) {
+                print(error);
+                return Icon(Icons.error, color: Colors.red);
+              },
             ),
           ),
           Padding(
@@ -41,11 +57,7 @@ class PostCard extends StatelessWidget {
                       onTap: () => onTapLike!(),
                       child: Column(
                         children: [
-                          SvgAsset(
-                            assetName: AssetName.heart,
-                            height: 24.w,
-                            width: 24.w,
-                          ),
+                          const Icon(EvaIcons.heartOutline,color: Colors.white,),
                           Text(like!, style: const TextStyle(
                             color: Colors.white,
                           ),)
@@ -55,11 +67,7 @@ class PostCard extends StatelessWidget {
                     SizedBox(width: 20.w,),
                     Column(
                       children: [
-                        SvgAsset(
-                          assetName: AssetName.headphone,
-                          height: 24.w,
-                          width: 24.w,
-                        ),
+                        const Icon(EvaIcons.messageCircleOutline, color: Colors.white,),
                         Text(comments!, style: const TextStyle(
                           color: Colors.white,
                         ),)
@@ -78,10 +86,10 @@ class PostCard extends StatelessWidget {
                               fontSize: 13,
                               overflow: TextOverflow.clip
                           ),),
-                          Text(title!, style: const TextStyle(
+                          Text(captions!, style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.normal,
-                              fontSize: 15,
+                              fontSize: 11,
                             overflow: TextOverflow.ellipsis
                           ),)
                         ],
@@ -92,7 +100,8 @@ class PostCard extends StatelessWidget {
 
               ],
             ),
-          )
+          ),
+          SizedBox(height: 10.h,)
         ],
       ),
     );

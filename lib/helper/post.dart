@@ -1,11 +1,12 @@
+
 class PostList {
-  final String uuid, photo_url, captions;
+  final String uuid, photo_url, captions, author;
   final int like, comment, views, unique_views;
   final String created_at;
 
   PostList(
       {required this.uuid,
-      required this.photo_url,
+      required this.photo_url,required this.author,
       required this.captions,
       required this.like,
       required this.comment,
@@ -16,6 +17,7 @@ class PostList {
   factory PostList.fromjson(Map<String, dynamic> json){
     return PostList(
         uuid: json['uuid'],
+        author: json['name'],
         photo_url: json['photo_url'],
         captions: json['captions'],
         like: json['like'],

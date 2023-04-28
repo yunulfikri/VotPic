@@ -5,19 +5,31 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import 'package:ruangbawah/helper/post.dart';
+import 'package:photoshare/helper/comment.dart';
+import 'post.dart';
 import '../screens/home.dart';
 import '../screens/login.dart';
 import 'package:dio/dio.dart' as api_dio;
 
 class ApiHelper{
   final String _secureKey = "kjndskj@jks3jk1yguks7823kjs24e2ns|v1"; // jangan ubah, kecuali di ubah di api nya. ini untuk authentikasi api
-  final String _serverUrl = "10.1.82.108"; // server API
+  final String _serverUrl = "192.168.100.36"; // server API
   final api_dio.Dio dio = Dio(); // get New DIO
   final Map<String, String> headers = {
     'Accept': 'application/json',
     'User-Agent': 'MobileApplication/api',
   }; // basic headers use for API
+
+  // function parsing =========================================================START
+  List<PostList> parsePost(String responseBody){
+    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+    return parsed.map<PostList>((json)=> PostList.fromjson(json)).toList();
+  }
+  List<CommentList> parseComment(String responseBody){
+    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+    return parsed.map<CommentList>((json)=> CommentList.fromjson(json)).toList();
+  }
+  // function parsing ========================================================END
 
 
   // Helper Login
@@ -78,14 +90,13 @@ class ApiHelper{
     });
 
     api_dio.Response<Map> response = await dio.post(
-      "http://"+_serverUrl + "/api/upload_photo",
+      "http://$_serverUrl/api/upload_photo",
       data: formData,
       options: Options(
         headers: headersAuth
       )
     );
     Map? responseBody = response.data;
-    print(responseBody!['image_url'].toString());
     return responseBody!['image_url']  == null ? 'failed' : responseBody['image_url'].toString();
   }
 
@@ -102,7 +113,7 @@ class ApiHelper{
       'captions': captions
     });
     api_dio.Response<Map> response = await dio.post(
-        "http://"+_serverUrl + "/api/post/store",
+        "http://$_serverUrl/api/post/store",
         data: formData,
         options: Options(
             headers: headersAuth
@@ -114,11 +125,7 @@ class ApiHelper{
     Get.offAll(()=> HomePage(), transition: Transition.downToUp);
   }
 
-  List<PostList> parsePost(String responseBody){
-    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<PostList>((json)=> PostList.fromjson(json)).toList();
-  }
-
+  //Mengambil semua data postingan pribadi
   Future<List<PostList>> getAllMyPost() async{
     String token = GetStorage().read('token').toString();
     Map<String, String> headersAuth = {
@@ -137,5 +144,70 @@ class ApiHelper{
      throw Exception('Failed to load album');
    }
   }
+  Future<List<PostList>> getAllDiscover() async{
+    String token = GetStorage().read('token').toString();
+    Map<String, String> headersAuth = {
+      'Accept': 'application/json',
+      'User-Agent': 'MobileApplication/api',
+      'Authorization': 'Bearer $token',
+      'Charset': 'utf-8'
+    };
+    final response = await http.post(Uri.http(_serverUrl, '/api/post/discover'), body: {
+      'secure': _secureKey,
+    }, headers: headersAuth);
+    if(response.statusCode == 200){
+      print(jsonDecode(response.body));
+      return compute(parsePost, response.body);
+    }else{
+      throw Exception('Failed to load album');
+    }
+  }
+
+  publishComment(String _comment, String uuid, context)async{
+    String token = GetStorage().read('token').toString();
+    Map<String, String> headersAuth = {
+      'Accept': 'application/json',
+      'User-Agent': 'MobileApplication/api',
+      'Authorization': 'Bearer $token',
+    };
+    api_dio.FormData formData = api_dio.FormData.fromMap({
+      'secure': _secureKey,
+      'post_id': uuid,
+      'comment': _comment
+    });
+    api_dio.Response<Map> response = await dio.post(
+        "http://$_serverUrl/api/post/comment/store",
+        data: formData,
+        options: Options(
+            headers: headersAuth
+        )
+    );
+    Map? responseBody = response.data;
+    var points = responseBody!['points'].toString();
+    String _textbar = "Thanks for comment, you got $points point.";
+    var snackBar =  SnackBar(content: Text(_textbar));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<List<CommentList>> getAllPostComment(String uuid) async{
+    String token = GetStorage().read('token').toString();
+    Map<String, String> headersAuth = {
+      'Accept': 'application/json',
+      'User-Agent': 'MobileApplication/api',
+      'Authorization': 'Bearer $token',
+      'Charset': 'utf-8'
+    };
+    final response = await http.post(Uri.http(_serverUrl, '/api/post/comment'), body: {
+      'secure': _secureKey,
+      'id': uuid
+    }, headers: headersAuth);
+    if(response.statusCode == 200){
+      print(jsonDecode(response.body));
+      return compute(parseComment, response.body);
+    }else{
+      throw Exception('Failed to load comment');
+    }
+  }
+
 
 }

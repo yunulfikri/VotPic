@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'login.dart';
-import 'package:ruangbawah/components/background_auth.dart';
+import '../components/background_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import '../helper/api_helper.dart';
